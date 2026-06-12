@@ -1,8 +1,8 @@
 import type { SubcircuitProps } from "@tscircuit/props";
 import { TPS63802DLAR } from "./TPS63802DLAR";
 
-export const TPS63802 = (props: SubcircuitProps) => (
-  <subcircuit width={100} height={100} {...props}>
+export const TPS63802 = () => (
+  <board routingDisabled>
     <TPS63802DLAR
       name="U1"
       schX={0}
@@ -31,6 +31,15 @@ export const TPS63802 = (props: SubcircuitProps) => (
         FB: { marginBottom: 1 },
       }}
     />
+
+    
+      <voltagesource
+        name="V_IN"
+        voltage="3.6V"
+        schX={-7.2}
+        schY={0.5}
+        schRotation="270deg"
+      />
 
     <inductor
       name="L1"
@@ -86,6 +95,15 @@ export const TPS63802 = (props: SubcircuitProps) => (
       schOrientation="vertical"
     />
 
+      <resistor
+        name="R_LOAD"
+        resistance="33"
+        footprint="0603"
+        schX={7.7}
+        schY={0.1}
+        schOrientation="vertical"
+      />
+
     <netlabel
       net="VIN"
       connection="U1.VIN"
@@ -115,6 +133,9 @@ export const TPS63802 = (props: SubcircuitProps) => (
       anchor="center"
     />
 
+        <trace from="V_IN.pin1" to="U1.VIN" />
+        <trace from="V_IN.pin2" to="net.GND" />
+
     <trace from="U1.L1" to="L1.pin1" />
     <trace from="U1.L2" to="L1.pin2" />
 
@@ -134,8 +155,33 @@ export const TPS63802 = (props: SubcircuitProps) => (
     <trace from="U1.AGND" to="net.GND" />
     <trace from="C1.pin2" to="net.GND" />
     <trace from="C2.pin2" to="net.GND" />
+        <trace from="R_LOAD.pin1" to="U1.VOUT" />
+        <trace from="R_LOAD.pin2" to="net.GND" />
     <trace from="R2.pin2" to="net.GND" />
-  </subcircuit>
+
+    
+        <voltageprobe
+          name="VIN_PROBE"
+          connectsTo="U1.VIN"
+          referenceTo="net.GND"
+        />
+        <voltageprobe
+          name="VOUT_PROBE"
+          connectsTo="U1.VOUT"
+          referenceTo="net.GND"
+        />
+        <voltageprobe
+          name="FB_PROBE"
+          connectsTo="U1.FB"
+          referenceTo="net.GND"
+        />
+
+        <analogsimulation
+          duration="2ms"
+          timePerStep="1us"
+          spiceEngine="ngspice"
+        />
+  </board>
 );
 
 export default TPS63802;

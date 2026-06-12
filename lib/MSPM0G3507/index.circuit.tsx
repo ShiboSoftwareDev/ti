@@ -1,4 +1,4 @@
-import type { SubcircuitProps } from "@tscircuit/props";
+import mspm0OpaSpiceModel from "./MSPM0_OPA-PSPICE/mspm0_opa.json";
 
 const pinLabels = {
   pin1: "PB13",
@@ -122,6 +122,18 @@ export default (props: SubcircuitProps) => (
       }}
       schHeight={5.3}
       name="U1"
+      spiceModel={
+        <spicemodel
+          source={mspm0OpaSpiceModel.source}
+          spicePinMapping={{
+            INP: "OPA0_IN0_P",
+            INN: "OPA0_IN0_N",
+            VCC: "VDD",
+            VEE: "VSS",
+            OUT: "OPA0_OUT",
+          }}
+        />
+      }
       schX={0}
       schY={0}
       pcbX={0}
@@ -133,6 +145,9 @@ export default (props: SubcircuitProps) => (
         ROSC: "R2.pin1",
         PA0: "net.PA0",
         PA1: "net.PA1",
+        OPA0_IN0_P: "net.OPA_IN",
+        OPA0_IN0_N: "net.OPA_FB",
+        OPA0_OUT: "net.OPA_OUT",
         SWDIO: "net.SWDIO",
         SWCLK: "net.SWCLK",
       }}
@@ -205,6 +220,64 @@ export default (props: SubcircuitProps) => (
       pcbX={11}
       pcbY={-4}
       connections={{ pin1: "U1.ROSC", pin2: "net.GND" }}
+    />
+
+    <voltagesource
+      name="VDD_SRC"
+      voltage="3.3V"
+      schX={-4.4}
+      schY={1.3}
+      schRotation={-90}
+      connections={{ pin1: "net.VDD", pin2: "net.GND" }}
+    />
+    <voltagesource
+      name="V_OPA_IN"
+      voltage="0.5V"
+      schX={2.4}
+      schY={-3.7}
+      schRotation={-90}
+      connections={{ pin1: "net.OPA_IN", pin2: "net.GND" }}
+    />
+    <resistor
+      name="R_OPA_FB"
+      resistance="10k"
+      footprint="0402"
+      schX={4.1}
+      schY={-2.9}
+      connections={{ pin1: "net.OPA_OUT", pin2: "net.OPA_FB" }}
+    />
+    <resistor
+      name="R_OPA_G"
+      resistance="10k"
+      footprint="0402"
+      schRotation={-90}
+      schX={3.3}
+      schY={-3.7}
+      connections={{ pin1: "net.OPA_FB", pin2: "net.GND" }}
+    />
+    <resistor
+      name="R_OPA_LOAD"
+      resistance="10k"
+      footprint="0402"
+      schRotation={-90}
+      schX={5.1}
+      schY={-3.7}
+      connections={{ pin1: "net.OPA_OUT", pin2: "net.GND" }}
+    />
+    <voltageprobe
+      name="OPA_IN_PROBE"
+      connectsTo="V_OPA_IN.pin1"
+      referenceTo="V_OPA_IN.pin2"
+    />
+    <voltageprobe
+      name="OPA_OUT_PROBE"
+      connectsTo="R_OPA_LOAD.pin1"
+      referenceTo="V_OPA_IN.pin2"
+    />
+    <analogsimulation
+      duration="100us"
+      timePerStep="1us"
+      spiceEngine="ngspice"
     />
 
     <resistor
